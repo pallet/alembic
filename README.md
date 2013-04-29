@@ -47,6 +47,12 @@ The `conflicting-versions` function returns a sequence of dependencies for a
 distilled dependency, where the dependency jar version doesn't match the version
 currently on the classpath.
 
+## Support and Discussion
+
+Discussion of alembic, either on the
+[clojure-tools](https://groups.google.com/forum/?fromgroups#!forum/clojure-tools)
+google group, or on #clojure or #pallet on freenode IRC.
+
 ## License
 
 Copyright © 2013 Hugo Duncan
