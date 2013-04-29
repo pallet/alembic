@@ -24,7 +24,7 @@ To add a dependency to the classpath, use the `distill` function, passing a
 leiningen style dependency vector.
 
 ```clj
-(alembic.still/distill [org.clojure/tools.logging "0.2.0"])
+(alembic.still/distill '[org.clojure/tools.logging "0.2.0"])
 ```
 
 If the dependency is added to the classpath, `distill` returns a sequence of
