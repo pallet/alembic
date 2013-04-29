@@ -12,7 +12,15 @@ it uses from the library).
 
 ## Project Dependency
 
-Add the following to your project's `:dev` profile `:dependencies` vector.
+Use the [lein-alembic](https://github.com/pallet/lein-alembic) plugin for
+leiningen.
+
+```clj
+:plugins [[lein-alembic "0.1.0"]]
+```
+
+It is possible to use Alembic without using the plugin by adding the alembic
+library directly to your project's dev or test dependencies.
 
 ```clj
 [alembic "0.1.0"]
