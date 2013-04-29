@@ -1,4 +1,4 @@
-(defproject alembic "0.1.0-SNAPSHOT"
+(defproject alembic "0.1.0"
   :description "A jar distiller"
   :url "https://github.com/pallet/alembic"
   :license {:name "Eclipse Public License"
