@@ -33,7 +33,7 @@ version on the classpath will be added to the classpath.  The jars with a
 version already on the classpath are not added to the classpath, and the
 currently loaded version is reported on the :current-version key.
 
-The still function returns nil, with no side-effects, if the dependency is
+The distill function returns nil, with no side-effects, if the dependency is
 already on the classpath.
 
 You can query the dependencies that have been added with the
