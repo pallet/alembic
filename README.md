@@ -12,19 +12,17 @@ it uses from the library).
 
 ## Project Dependency
 
-Use the [lein-alembic](https://github.com/pallet/lein-alembic) plugin for
-leiningen.
+To use Alembic with nREPL or any other clojure REPL, you will need to add
+Alembic to you development dependencies.  For a leiningen based project, you can
+do this by adding it to the `:dependencies` vector of the `:dev` profile in
+`project.clj`.
 
 ```clj
-:plugins [[lein-alembic "0.1.0"]]
+:profiles {:dev {:dependencies [[alembic "0.1.0"]]}}
 ```
 
-It is possible to use Alembic without using the plugin by adding the alembic
-library directly to your project's dev or test dependencies.
-
-```clj
-[alembic "0.1.0"]
-```
+You can enable Alembic on all you projects, by adding it to the `:dependencies`
+vector of the `:user` profile in `~/.lein/profiles.clj`.
 
 ## Usage
 
