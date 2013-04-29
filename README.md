@@ -15,7 +15,7 @@ it uses from the library).
 Add the following to your project's `:dev` profile `:dependencies` vector.
 
 ```clj
-[alembic "0.1.0-SNAPSHOT"]
+[alembic "0.1.0"]
 ```
 
 ## Usage
