@@ -1,8 +1,9 @@
 # alembic
 
-Alembic is a clojure library that allows you to distill jars onto your
-classpath.  It uses leiningen and pomegranate to resolve the jars, classlojure
-to isolate leiningen and its dependencies, and dynapath to modify the classpath.
+Alembic is a clojure library that allows you to distill jars onto your classpath
+in a running JVM instance.  It uses leiningen and pomegranate to resolve the
+jars, classlojure to isolate leiningen and its dependencies, and dynapath to
+modify the classpath.
 
 This means you can use lein and pomegranate without their dependencies
 interfering with your project classpath.  The only dependencies added are
