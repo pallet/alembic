@@ -172,10 +172,21 @@ string.  If the dependency is already on the classpath, returns nil."
       dep-jars)))
 
 (defn distill
+  "Add a dependency to the classpath.
+
+`:repositories`
+: specify a map of leiningen style repository definitions to be used when
+  resolving.  Defaults to the repositories specified in the current lein
+  project.
+
+`:still`
+: specifies an alembic still to use.  This would be considered advanced
+  usage (see the tests for an example)."
   [dependency & {:keys [repositories still]
                  :or {still the-still
                       repositories (project-repositories still)}}]
-  (add-dependency still dependency repositories))
+  (let [repositories (into {} repositories)]
+    (add-dependency still dependency repositories)))
 
 (defn dependencies-added
   ([still]
