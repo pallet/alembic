@@ -1,0 +1,174 @@
+<html lang="en">
+  <head>
+    <title>alembic.still documentation</title>
+    <link href="css/default.css" type="text/css" rel="stylesheet" />
+    <link href="css/codox-md.css" type="text/css" rel="stylesheet" />
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/page_effects.js"></script>
+  </head>
+  <body>
+    <header>
+    <div data-scrollspy="scrollspy" class="topbar">
+      <div class="topbar-inner">
+        <div class="container">
+          <a href="/" class="brand">Pallet</a>
+          <ul class="nav">
+            <li class=""><a href="/doc">Documentation</a></li>
+            <li class=""><a href="/news">News</a></li>
+            <li class=""><a href="/blog">Blog</a></li>
+            <li class=""><a href="https://github.com/pallet/pallet">Code</a></li>
+            <li class=""><a href="/services">Services</a></li>
+            <li class=""><a href="/support">Support</a></li>
+            <li class=""><a href="/contact">Contact</a></li>
+          </ul>
+          <form action="http://www.google.com/search" method="get" class="pull-right">
+            <input placeholder="Search" value="" maxlength="255" name="q" type="text" />
+            <input value="palletops.com" type="hidden" name="sitesearch" />
+          </form>
+        </div>
+      </div>
+    </div>
+      <div id="header">
+        <h1><a href="http://palletops.com"><span class="project-title">Alembic 0.1.1-SNAPSHOT API documentation</span></a></h1>
+      </div>
+    </header>
+    <navigation>
+      <div id="namespaces" class="sidebar">
+        <h3>Namespaces</h3>
+        <ul class="ns-links">
+          <li class="ns-list"><a class="ns-link ns-name" href="alembic.still.html">alembic.still</a></li>
+        </ul>
+      </div>
+      <div id="vars" class="sidebar">
+        <h3>Public Vars</h3>
+        <ul class="ns-var-links">
+          <li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-add-dependency">add-dependency</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-alembic-classloader">alembic-classloader</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-alembic-cp">alembic-cp</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-classpath-urls">classpath-urls</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-conflicting-versions">conflicting-versions</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-coords-%3Eids">coords-&gt;ids</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-distill">distill</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-extract-jar">extract-jar</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-make-still">make-still</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-meta-inf-properties-url">meta-inf-properties-url</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-meta-inf-version">meta-inf-version</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-project-repositories">project-repositories</a></li>
+        </ul>
+      </div>
+    </navigation>
+    <article>
+      <div id="content" class="namespace-docs">
+        <h2 class="namespace-title">alembic.still documentation</h2>
+        <div class="doc"><p>Track the added dependencies, so that we can query for addition to
+project.clj</p>
+
+<p>Can not create a classloader with a jar inside a jar
+http://bugs.sun.com/bugdatabase/view<em>bug.do?bug</em>id=4388202</p>
+</div>
+        <div class="ns-vars">
+          <div class="public">
+            <h3><a id="var-add-dependency" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L158">add-dependency</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[still dependency repositories]</div>
+            
+            
+            <div class="doc"><p>Add a dependency to the classpath.  Returns a sequence of maps, each
+containing a :coords vector, a :jar path and possibly a :current-version
+string.  If the dependency is already on the classpath, returns nil.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-alembic-classloader" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L51">alembic-classloader</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[]</div>
+            
+            
+            <div class="doc"><p>Return a classloader for alembic to use to resolve dependencies</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-alembic-cp" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L39">alembic-cp</a></h3>
+            <h4 class="var-type var" id="var-type">var</h4>
+            
+            
+            
+            <div class="doc"><p>Classpath URLs for a still</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-classpath-urls" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L19">classpath-urls</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[]</div>
+            
+            
+            <div class="doc"><p>Return the current classpath.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-conflicting-versions" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L201">conflicting-versions</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[dependency still]</div><div class="usage">[dependency]</div>
+            
+            
+            <div class="doc"><p>Return a sequence of possibly conflicting versions of jars required for the
+specified dependency (dependency must have been added with <code>add-dependency</code>).</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-coords-%3Eids" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L107">coords-&gt;ids</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[[artifact version :as coords]]</div>
+            
+            
+            <div class="doc"><p>Convert coords to a map of :group-id and :artifact-id.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-distill" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L174">distill</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[dependency &amp; {:keys [repositories still], :or {still the-still, repositories (project-repositories still)}}]</div>
+            
+            
+            <div class="doc"><p>Add a dependency to the classpath.</p>
+
+<p><code>:repositories</code>
+: specify a map of leiningen style repository definitions to be used when
+  resolving.  Defaults to the repositories specified in the current lein
+  project.</p>
+
+<p><code>:still</code>
+: specifies an alembic still to use.  This would be considered advanced
+  usage (see the tests for an example).</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-extract-jar" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L24">extract-jar</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[jar-path]</div>
+            
+            
+            <div class="doc"><p>Extract a jar on the classpath to the filesystem, returning its URL.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-make-still" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L58">make-still</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[classloader]</div>
+            
+            
+            <div class="doc"><p>Create an still that that can distill jars into the specified classloader.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-meta-inf-properties-url" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L113">meta-inf-properties-url</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[still coords]</div>
+            
+            
+            <div class="doc"><p>Return a URL for the META-INF properties file for the given <code>coords</code>.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-meta-inf-version" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L122">meta-inf-version</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[still coords]</div>
+            
+            
+            <div class="doc"><p>Return a version string for the currently loaded version of the given
+<code>coords</code>.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-project-repositories" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L78">project-repositories</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[still project-file]</div><div class="usage">[still]</div>
+            
+            
+            <div class="doc"><p>Load project repositories from leiningen.</p>
+</div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </body>
+
+</html>
