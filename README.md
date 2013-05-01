@@ -1,5 +1,11 @@
 # alembic
 
+[Repository](https://github.com/pallet/alembic) &#xb7;
+[Issues](https://github.com/pallet/alembic/issues) &#xb7;
+[API docs](http://palletops.com/alembic/0.1/api) &#xb7;
+[Annotated source](http://palletops.com/alembic/0.1/annotated/uberdoc.html) &#xb7;
+[Release Notes](https://github.com/pallet/alembic/blob/develop/ReleaseNotes.md)
+
 Alembic is a clojure library that allows you to distill jars onto your classpath
 in a running JVM instance.  It uses leiningen and pomegranate to resolve the
 jars, classlojure to isolate leiningen and its dependencies, and dynapath to
