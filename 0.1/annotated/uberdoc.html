@@ -3168,12 +3168,22 @@ string.  If the dependency is already on the classpath, returns nil.</p>
                      (-&gt; m
                          (update-in [:dependencies] conj dependency)
                          (update-in [:jars] assoc dependency dep-jars))))
-      dep-jars)))</pre></td></tr><tr><td class="docs">
+      dep-jars)))</pre></td></tr><tr><td class="docs"><p>Add a dependency to the classpath.</p>
+
+<p><code>:repositories</code>
+: specify a map of leiningen style repository definitions to be used when
+  resolving.  Defaults to the repositories specified in the current lein
+  project.</p>
+
+<p><code>:still</code>
+: specifies an alembic still to use.  This would be considered advanced
+  usage (see the tests for an example).</p>
 </td><td class="codes"><pre class="brush: clojure">(defn distill
   [dependency &amp; {:keys [repositories still]
                  :or {still the-still
                       repositories (project-repositories still)}}]
-  (add-dependency still dependency repositories))</pre></td></tr><tr><td class="docs">
+  (let [repositories (into {} repositories)]
+    (add-dependency still dependency repositories)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn dependencies-added
   ([still]
      (:dependencies @still))
