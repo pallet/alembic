@@ -84,7 +84,9 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
          (require '[leiningen.core.project :as ~'project])
          (:repositories (leiningen.core.project/read ~project-file)))))
   ([still]
-     (project-repositories still "project.clj")))
+     (project-repositories still "project.clj"))
+  ([]
+     (project-repositories the-still)))
 
 (defn resolve-dependency
   [still dependency repositories]

@@ -49,6 +49,12 @@ currently loaded version is reported on the :current-version key.
 The distill function returns nil, with no side-effects, if the dependency is
 already on the classpath.
 
+By default, `distill` uses the repositories in the current lein project.  You
+can override this by passing a map of lein style repository information to the
+`:repositories` option.  The `project-repositories` function can be used to
+obtain the lein project repositories, should you want to adapt these to pass as
+an `:repositories` argument.
+
 You can query the dependencies that have been added with the
 `dependencies-added` function, which returns a sequence of leiningen style
 dependency vectors.
