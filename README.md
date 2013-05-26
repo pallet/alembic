@@ -25,7 +25,7 @@ do this by adding it to the `:dependencies` vector of the `:dev` profile in
 `project.clj`.
 
 ```clj
-:profiles {:dev {:dependencies [[alembic "0.1.1"]]}}
+:profiles {:dev {:dependencies [[alembic "0.1.2"]]}}
 ```
 
 You can enable Alembic on all you projects, by adding it to the `:dependencies`
