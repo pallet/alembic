@@ -84,7 +84,9 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
          (require '[leiningen.core.project :as ~'project])
          (:repositories (leiningen.core.project/read ~project-file)))))
   ([still]
-     (project-repositories still "project.clj")))
+     (project-repositories still "project.clj"))
+  ([]
+     (project-repositories the-still)))
 
 (defn resolve-dependency
   [still dependency repositories]
@@ -156,14 +158,19 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
 
 
 (defn add-dependency
-  "Add a dependency to the classpath.  Returns a sequence of maps, each
-containing a :coords vector, a :jar path and possibly a :current-version
-string.  If the dependency is already on the classpath, returns nil."
-  [still dependency repositories]
+  "Add a dependency to the classpath. Returns a sequence of maps, each
+containing a :coords vector, a :jar path and possibly
+a :current-version string. If the dependency is already on the
+classpath, returns nil. If the optional parameter :verbose is
+true (the default), then WARN messages will be printed to the console
+if a version of a library is requested and the classpath already
+contains a different version of the same library"
+  [still dependency repositories
+   & {:keys [verbose] :as opts :or {verbose true}}]
   (when-not (meta-inf-properties-url still dependency)
     (let [dep-jars (->> (resolve-dependency still dependency repositories)
                         (current-dep-versions still))]
-      (warn-mismatch-versions dep-jars)
+      (when verbose (warn-mismatch-versions dep-jars))
       (add-dep-jars still dep-jars)
       (swap! still (fn [m]
                      (-> m
@@ -181,12 +188,18 @@ string.  If the dependency is already on the classpath, returns nil."
 
 `:still`
 : specifies an alembic still to use.  This would be considered advanced
-  usage (see the tests for an example)."
-  [dependency & {:keys [repositories still]
+  usage (see the tests for an example).
+
+`:verbose`
+: specifies whether WARN messages should be printed to the console if
+  a version of library is requests and there is already a different
+  version of the same library in the classpath. Defaults to true"
+  [dependency & {:keys [repositories still verbose]
                  :or {still the-still
-                      repositories (project-repositories still)}}]
+                      repositories (project-repositories still)
+                      verbose true}}]
   (let [repositories (into {} repositories)]
-    (add-dependency still dependency repositories)))
+    (add-dependency still dependency repositories :verbose verbose)))
 
 (defn dependencies-added
   ([still]
