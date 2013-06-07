@@ -196,9 +196,9 @@ contains a different version of the same library"
   version of the same library in the classpath. Defaults to true"
   [dependency & {:keys [repositories still verbose]
                  :or {still the-still
-                      repositories (project-repositories still)
                       verbose true}}]
-  (let [repositories (into {} repositories)]
+  (let [repositories (into {} (or repositories
+                                  (project-repositories still)))]
     (add-dependency still dependency repositories :verbose verbose)))
 
 (defn dependencies-added
