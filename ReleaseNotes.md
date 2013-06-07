@@ -1,3 +1,7 @@
+# 0.1.3
+
+- Don't read project.clj when :repositories passed to distill
+
 # 0.1.2
 
 - Allow disabling version mismatch messages at the console.
