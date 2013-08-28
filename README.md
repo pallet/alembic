@@ -12,10 +12,9 @@ jars, classlojure to isolate leiningen and its dependencies, and dynapath to
 modify the classpath.
 
 This means you can use lein and pomegranate without their dependencies
-interfering with your project classpath.  The only dependencies added are
-classlojure and dynapath - both smallish libraries (though I wish classlojure
-didn't depend on useful, which is rather a large dependency for the one function
-it uses from the library).
+interfering with your project classpath.  The only dependencies added
+are classlojure and dynapath - both small libraries with no transitive
+dependencies.
 
 ## Project Dependency
 
@@ -25,7 +24,7 @@ do this by adding it to the `:dependencies` vector of the `:dev` profile in
 `project.clj`.
 
 ```clj
-:profiles {:dev {:dependencies [[alembic "0.1.3"]]}}
+:profiles {:dev {:dependencies [[alembic "0.1.4"]]}}
 ```
 
 You can enable Alembic on all you projects, by adding it to the `:dependencies`
