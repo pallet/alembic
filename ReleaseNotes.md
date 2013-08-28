@@ -1,3 +1,8 @@
+# 0.1.4
+
+- Update to classlojure 0.7.0
+  Removes transitive dependency on useful.
+
 # 0.1.3
 
 - Don't read project.clj when :repositories passed to distill
