@@ -62,7 +62,5 @@
           "tools.logging on the classpath")
       (is (= [tools-logging] (still/dependencies-added still))
           "distilled dependency listed")
-      (is (= 1 (count (still/conflicting-versions tools-logging still)))
-          "possible distilled dependency conflict listed"))
-    (let [deps2 (still/distill tools-logging :still still)]
-      (is (nil? deps2) "Not loaded again"))))
+      (is (= 1 (count (still/conflicting-versions still)))
+          "possible distilled dependency conflict listed"))))
