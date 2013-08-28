@@ -29,7 +29,7 @@
       </div>
     </div>
       <div id="header">
-        <h1><a href="http://palletops.com"><span class="project-title">Alembic 0.1.1 API documentation</span></a></h1>
+        <h1><a href="http://palletops.com"><span class="project-title">Alembic 0.1.4 API documentation</span></a></h1>
       </div>
     </header>
     <navigation>
@@ -57,14 +57,18 @@ http://bugs.sun.com/bugdatabase/view<em>bug.do?bug</em>id=4388202</p>
 </div>
         <div class="ns-vars">
           <div class="public">
-            <h3><a id="var-add-dependency" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L158">add-dependency</a></h3>
+            <h3><a id="var-add-dependency" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L160">add-dependency</a></h3>
             <h4 class="var-type fn" id="var-type">fn</h4>
-            <div class="usage">[still dependency repositories]</div>
+            <div class="usage">[still dependency repositories &amp; {:keys [verbose], :as opts, :or {verbose true}}]</div>
             
             
-            <div class="doc"><p>Add a dependency to the classpath.  Returns a sequence of maps, each
-containing a :coords vector, a :jar path and possibly a :current-version
-string.  If the dependency is already on the classpath, returns nil.</p>
+            <div class="doc"><p>Add a dependency to the classpath. Returns a sequence of maps, each
+containing a :coords vector, a :jar path and possibly
+a :current-version string. If the dependency is already on the
+classpath, returns nil. If the optional parameter :verbose is
+true (the default), then WARN messages will be printed to the console
+if a version of a library is requested and the classpath already
+contains a different version of the same library</p>
 </div>
           </div><div class="public">
             <h3><a id="var-alembic-classloader" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L51">alembic-classloader</a></h3>
@@ -91,7 +95,7 @@ string.  If the dependency is already on the classpath, returns nil.</p>
             <div class="doc"><p>Return the current classpath.</p>
 </div>
           </div><div class="public">
-            <h3><a id="var-conflicting-versions" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L201">conflicting-versions</a></h3>
+            <h3><a id="var-conflicting-versions" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L214">conflicting-versions</a></h3>
             <h4 class="var-type fn" id="var-type">fn</h4>
             <div class="usage">[dependency still]</div><div class="usage">[dependency]</div>
             
@@ -100,7 +104,7 @@ string.  If the dependency is already on the classpath, returns nil.</p>
 specified dependency (dependency must have been added with <code>add-dependency</code>).</p>
 </div>
           </div><div class="public">
-            <h3><a id="var-coords-%3Eids" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L107">coords-&gt;ids</a></h3>
+            <h3><a id="var-coords-%3Eids" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L109">coords-&gt;ids</a></h3>
             <h4 class="var-type fn" id="var-type">fn</h4>
             <div class="usage">[[artifact version :as coords]]</div>
             
@@ -108,9 +112,9 @@ specified dependency (dependency must have been added with <code>add-dependency<
             <div class="doc"><p>Convert coords to a map of :group-id and :artifact-id.</p>
 </div>
           </div><div class="public">
-            <h3><a id="var-distill" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L174">distill</a></h3>
+            <h3><a id="var-distill" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L181">distill</a></h3>
             <h4 class="var-type fn" id="var-type">fn</h4>
-            <div class="usage">[dependency &amp; {:keys [repositories still], :or {still the-still, repositories (project-repositories still)}}]</div>
+            <div class="usage">[dependency &amp; {:keys [repositories still verbose], :or {still the-still, verbose true}}]</div>
             
             
             <div class="doc"><p>Add a dependency to the classpath.</p>
@@ -123,6 +127,11 @@ specified dependency (dependency must have been added with <code>add-dependency<
 <p><code>:still</code>
 : specifies an alembic still to use.  This would be considered advanced
   usage (see the tests for an example).</p>
+
+<p><code>:verbose</code>
+: specifies whether WARN messages should be printed to the console if
+  a version of library is requests and there is already a different
+  version of the same library in the classpath. Defaults to true</p>
 </div>
           </div><div class="public">
             <h3><a id="var-extract-jar" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L24">extract-jar</a></h3>
@@ -141,7 +150,7 @@ specified dependency (dependency must have been added with <code>add-dependency<
             <div class="doc"><p>Create an still that that can distill jars into the specified classloader.</p>
 </div>
           </div><div class="public">
-            <h3><a id="var-meta-inf-properties-url" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L113">meta-inf-properties-url</a></h3>
+            <h3><a id="var-meta-inf-properties-url" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L115">meta-inf-properties-url</a></h3>
             <h4 class="var-type fn" id="var-type">fn</h4>
             <div class="usage">[still coords]</div>
             
@@ -149,7 +158,7 @@ specified dependency (dependency must have been added with <code>add-dependency<
             <div class="doc"><p>Return a URL for the META-INF properties file for the given <code>coords</code>.</p>
 </div>
           </div><div class="public">
-            <h3><a id="var-meta-inf-version" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L122">meta-inf-version</a></h3>
+            <h3><a id="var-meta-inf-version" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L124">meta-inf-version</a></h3>
             <h4 class="var-type fn" id="var-type">fn</h4>
             <div class="usage">[still coords]</div>
             
@@ -160,7 +169,7 @@ specified dependency (dependency must have been added with <code>add-dependency<
           </div><div class="public">
             <h3><a id="var-project-repositories" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L78">project-repositories</a></h3>
             <h4 class="var-type fn" id="var-type">fn</h4>
-            <div class="usage">[still project-file]</div><div class="usage">[still]</div>
+            <div class="usage">[still project-file]</div><div class="usage">[still]</div><div class="usage">[]</div>
             
             
             <div class="doc"><p>Load project repositories from leiningen.</p>

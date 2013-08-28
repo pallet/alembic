@@ -3028,8 +3028,8 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>alembic -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">alembic</h1><h2 class="project-version">0.1.1</h2><br /><p>A jar distiller</p>
-</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.4.0</td></tr><tr><td class="dep-name">lein-as-resource</td><td class="dotted"><hr /></td><td class="dep-version">2.1.3</td></tr><tr><td class="dep-name">classlojure</td><td class="dotted"><hr /></td><td class="dep-version">0.6.6</td></tr><tr><td class="dep-name">org.tcrawley/dynapath</td><td class="dotted"><hr /></td><td class="dep-version">0.2.3</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#alembic.still">alembic.still</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#alembic.still" name="alembic.still"><h1 class="project-name">alembic.still</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Track the added dependencies, so that we can query for addition to
+</script><title>alembic -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">alembic</h1><h2 class="project-version">0.1.4</h2><br /><p>A jar distiller</p>
+</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.4.0</td></tr><tr><td class="dep-name">lein-as-resource</td><td class="dotted"><hr /></td><td class="dep-version">2.1.3</td></tr><tr><td class="dep-name">org.flatland/classlojure</td><td class="dotted"><hr /></td><td class="dep-version">0.7.0</td></tr><tr><td class="dep-name">org.tcrawley/dynapath</td><td class="dotted"><hr /></td><td class="dep-version">0.2.3</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#alembic.still">alembic.still</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#alembic.still" name="alembic.still"><h1 class="project-name">alembic.still</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Track the added dependencies, so that we can query for addition to
 project.clj</p>
 
 <p>Can not create a classloader with a jar inside a jar
@@ -3097,7 +3097,9 @@ http://bugs.sun.com/bugdatabase/view<em>bug.do?bug</em>id=4388202</p>
          (require '[leiningen.core.project :as ~'project])
          (:repositories (leiningen.core.project/read ~project-file)))))
   ([still]
-     (project-repositories still &quot;project.clj&quot;)))</pre></td></tr><tr><td class="docs">
+     (project-repositories still &quot;project.clj&quot;))
+  ([]
+     (project-repositories the-still)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn resolve-dependency
   [still dependency repositories]
   (classlojure/eval-in
@@ -3154,15 +3156,20 @@ http://bugs.sun.com/bugdatabase/view<em>bug.do?bug</em>id=4388202</p>
     (doseq [{:keys [coords current-version jar]} dep-jars
             :let [[artifact version] coords]]
       (when-not current-version
-        (util/add-classpath-url classloader (.toURL (file jar)))))))</pre></td></tr><tr><td class="docs"><p>Add a dependency to the classpath.  Returns a sequence of maps, each
-containing a :coords vector, a :jar path and possibly a :current-version
-string.  If the dependency is already on the classpath, returns nil.</p>
+        (util/add-classpath-url classloader (.toURL (file jar)))))))</pre></td></tr><tr><td class="docs"><p>Add a dependency to the classpath. Returns a sequence of maps, each
+containing a :coords vector, a :jar path and possibly
+a :current-version string. If the dependency is already on the
+classpath, returns nil. If the optional parameter :verbose is
+true (the default), then WARN messages will be printed to the console
+if a version of a library is requested and the classpath already
+contains a different version of the same library</p>
 </td><td class="codes"><pre class="brush: clojure">(defn add-dependency
-  [still dependency repositories]
+  [still dependency repositories
+   &amp; {:keys [verbose] :as opts :or {verbose true}}]
   (when-not (meta-inf-properties-url still dependency)
     (let [dep-jars (-&gt;&gt; (resolve-dependency still dependency repositories)
                         (current-dep-versions still))]
-      (warn-mismatch-versions dep-jars)
+      (when verbose (warn-mismatch-versions dep-jars))
       (add-dep-jars still dep-jars)
       (swap! still (fn [m]
                      (-&gt; m
@@ -3178,12 +3185,18 @@ string.  If the dependency is already on the classpath, returns nil.</p>
 <p><code>:still</code>
 : specifies an alembic still to use.  This would be considered advanced
   usage (see the tests for an example).</p>
+
+<p><code>:verbose</code>
+: specifies whether WARN messages should be printed to the console if
+  a version of library is requests and there is already a different
+  version of the same library in the classpath. Defaults to true</p>
 </td><td class="codes"><pre class="brush: clojure">(defn distill
-  [dependency &amp; {:keys [repositories still]
+  [dependency &amp; {:keys [repositories still verbose]
                  :or {still the-still
-                      repositories (project-repositories still)}}]
-  (let [repositories (into {} repositories)]
-    (add-dependency still dependency repositories)))</pre></td></tr><tr><td class="docs">
+                      verbose true}}]
+  (let [repositories (into {} (or repositories
+                                  (project-repositories still)))]
+    (add-dependency still dependency repositories :verbose verbose)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn dependencies-added
   ([still]
      (:dependencies @still))
