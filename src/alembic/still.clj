@@ -11,6 +11,7 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
    [classlojure.core :refer [base-classloader classlojure ext-classloader]
     :as classlojure]
    [clojure.java.io :refer [copy file reader resource]]
+   [clojure.pprint :refer [pprint]]
    [dynapath.util :as util])
   (:import
    java.util.Properties))
@@ -27,8 +28,7 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
   {:pre [(.endsWith jar-path ".jar")]}
   (let [jar-url (resource jar-path)
         f (java.io.File/createTempFile
-           (subs jar-path 0 (- (count jar-path) 4)) ".jar")
-        ]
+           (subs jar-path 0 (- (count jar-path) 4)) ".jar")]
     (.deleteOnExit f)
     (with-open [is (.getContent jar-url)]
       (copy is f))
@@ -88,8 +88,8 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
   ([]
      (project-repositories the-still)))
 
-(defn resolve-dependency
-  [still dependency repositories]
+(defn resolve-dependencies
+  [still dependencies repositories]
   (classlojure/eval-in
    (:alembic-classloader @still)
    `(mapv
@@ -99,7 +99,7 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
           :jar (-> dep# meta :file apath#)}))
      (keys
       (aether/resolve-dependencies
-       :coordinates '[~dependency]
+       :coordinates '~(vec dependencies)
        :repositories ~repositories)))))
 
 (defn properties-path
@@ -145,41 +145,55 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
   (doseq [{:keys [coords current-version]} dep-jars
           :let [[artifact version] coords]]
     (when (and current-version (not= current-version version))
-      (println "WARN:" artifact "version" version "requested, but "
+      (println "WARN:" artifact "version" version "requested, but"
                current-version "already on classpath."))))
 
+(defn conflicting-version?
+  "Predicate to check for a conflicting version."
+  [{:keys [coords current-version]}]
+  (and current-version (not= current-version (second coords))))
+
 (defn add-dep-jars
+  "Add any non-conflicting dependency jars.  Returns the sequence of
+dependency jar maps of the loaded jars."
   [still dep-jars]
-  (let [{:keys [classloader]} @still]
-    (doseq [{:keys [coords current-version jar]} dep-jars
-            :let [[artifact version] coords]]
-      (when-not current-version
-        (util/add-classpath-url classloader (.toURL (file jar)))))))
+  (let [{:keys [classloader]} @still
+        deps (remove :current-version dep-jars)]
+    (doseq [{:keys [jar]} deps]
+      (util/add-classpath-url classloader (.toURL (file jar))))
+    deps))
 
-
-(defn add-dependency
-  "Add a dependency to the classpath. Returns a sequence of maps, each
-containing a :coords vector, a :jar path and possibly
-a :current-version string. If the dependency is already on the
-classpath, returns nil. If the optional parameter :verbose is
+(defn add-dependencies
+  "Add dependencies to the classpath. Returns a sequence of maps, each
+containing a `:coords` vector, a `:jar` path and possibly a
+`:current-version` string. If the optional parameter :verbose is
 true (the default), then WARN messages will be printed to the console
 if a version of a library is requested and the classpath already
-contains a different version of the same library"
-  [still dependency repositories
-   & {:keys [verbose] :as opts :or {verbose true}}]
-  (when-not (meta-inf-properties-url still dependency)
-    (let [dep-jars (->> (resolve-dependency still dependency repositories)
-                        (current-dep-versions still))]
-      (when verbose (warn-mismatch-versions dep-jars))
-      (add-dep-jars still dep-jars)
-      (swap! still (fn [m]
-                     (-> m
-                         (update-in [:dependencies] conj dependency)
-                         (update-in [:jars] assoc dependency dep-jars))))
-      dep-jars)))
+contains a different version of the same library."
+  [still dependencies repositories {:keys [verbose] :as opts
+                                    :or {verbose true}}]
+  (let [dep-jars (->> (resolve-dependencies still dependencies repositories)
+                      (current-dep-versions still))]
+    (when verbose (warn-mismatch-versions dep-jars))
+    (add-dep-jars still dep-jars)
+    (swap! still (fn [m]
+                   (-> m
+                       (update-in [:dependencies]
+                                  #(distinct (concat % dependencies)))
+                       (update-in [:jars]
+                                  #(distinct (concat % dep-jars))))))
+    dep-jars))
 
-(defn distill
-  "Add a dependency to the classpath.
+(defn print-coords
+  "Pretty print the dependency coordinates of a sequence of dependencies."
+  [deps]
+  (pprint (vec (sort-by first (map :coords deps)))))
+
+(defn distill*
+  "Add dependencies to the classpath.  Returns a sequence of dependency maps.
+
+`dependencies` can be a coordinate vector, or a sequence of such
+vectors.
 
 `:repositories`
 : specify a map of leiningen style repository definitions to be used when
@@ -194,12 +208,86 @@ contains a different version of the same library"
 : specifies whether WARN messages should be printed to the console if
   a version of library is requests and there is already a different
   version of the same library in the classpath. Defaults to true"
-  [dependency & {:keys [repositories still verbose]
+  [dependencies {:keys [repositories still verbose]
                  :or {still the-still
                       verbose true}}]
   (let [repositories (into {} (or repositories
                                   (project-repositories still)))]
-    (add-dependency still dependency repositories :verbose verbose)))
+    (add-dependencies
+     still
+     (if (every? vector? dependencies) dependencies [dependencies])
+     repositories
+     {:verbose verbose})))
+
+(defn distill
+  "Add dependencies to the classpath.
+
+`dependencies` can be a coordinate vector, or a sequence of such vectors.
+
+`:repositories`
+: specify a map of leiningen style repository definitions to be used when
+  resolving.  Defaults to the repositories specified in the current lein
+  project.
+
+`:still`
+: specifies an alembic still to use.  This would be considered advanced
+  usage (see the tests for an example).
+
+`:verbose`
+: specifies whether WARN messages should be printed to the console if
+  a version of library is requests and there is already a different
+  version of the same library in the classpath. Defaults to true"
+  [dependencies & {:keys [repositories still verbose]
+                   :or {still the-still
+                        verbose true}
+                   :as options}]
+  (let [dep-jars (distill* dependencies options)
+        loaded (remove conflicting-version? dep-jars)
+        conflicting (filter conflicting-version? dep-jars)]
+    (when (seq loaded)
+      (println "Loaded dependencies:")
+      (print-coords loaded))
+    (when (seq conflicting)
+      (println
+       "Dependencies not loaded due to conflict with previous jars :")
+      (print-coords conflicting))))
+
+(defn load-project*
+  "Load project.clj dependencies.  Returns a vector of jars required
+for the dependencies.  Loads any of the jars that are not conflicting
+with versions already on the classpath."
+  [project-file {:keys [still verbose] :as options}]
+  (let [[dependencies repositories]
+        (classlojure/eval-in
+         (:alembic-classloader @still)
+         `(do
+            (require '[leiningen.core.project :as ~'project])
+            (let [project# (leiningen.core.project/read ~project-file)]
+              [(:dependencies project#)
+               (:repositories project#)])))]
+    (add-dependencies still dependencies (into {} repositories) options)))
+
+(defn load-project
+  "Load project.clj dependencies.  Prints the dependency jars that are
+loaded, and those that were not loaded due to conflicts."
+  ([project-file & {:keys [still verbose]
+                    :or {still the-still
+                         verbose true}
+                    :as options}]
+     (let [dep-jars (load-project* project-file {:still still :verbose verbose})
+           loaded (remove conflicting-version? dep-jars)
+           conflicting (filter conflicting-version? dep-jars)]
+       (when (seq loaded)
+         (println "Loaded dependencies:")
+         (print-coords loaded))
+       (when (seq conflicting)
+         (println
+          "Dependencies not loaded due to conflict with previous jars :")
+         (print-coords conflicting))))
+  ([project]
+     (load-project project :still the-still))
+  ([]
+     (load-project "project.clj")))
 
 (defn dependencies-added
   ([still]
@@ -209,12 +297,11 @@ contains a different version of the same library"
 (defn dependency-jars
   ([still]
      (:jars @still))
-  ([] (dependencies-added the-still)))
+  ([] (dependency-jars the-still)))
 
 (defn conflicting-versions
-  "Return a sequence of possibly conflicting versions of jars required for the
-specified dependency (dependency must have been added with `add-dependency`)."
-  ([dependency still]
-     (filter :current-version (get (dependency-jars still) dependency)))
-  ([dependency]
-     (conflicting-versions dependency the-still)))
+  "Return a sequence of possibly conflicting versions of jars required
+for dependencies by the still)."
+  ([still]
+     (filter conflicting-version? (dependency-jars still)))
+  ([] (conflicting-versions the-still)))

@@ -24,7 +24,7 @@ do this by adding it to the `:dependencies` vector of the `:dev` profile in
 `project.clj`.
 
 ```clj
-:profiles {:dev {:dependencies [[alembic "0.1.4"]]}}
+:profiles {:dev {:dependencies [[alembic "0.2.0"]]}}
 ```
 
 You can enable Alembic on all you projects, by adding it to the `:dependencies`
@@ -32,27 +32,45 @@ vector of the `:user` profile in `~/.lein/profiles.clj`.
 
 ## Usage
 
+### Reloading project.clj
+
+If you modify the dependencies in your `project.clj` file, you can load the
+modified dependencies with `load-project`.
+
+This will add all non-conflicting dependency changes.  Only new
+dependencies are considered non-conflicting.  New versions of existing
+dependencies are not loaded.  Removed dependencies are not unloaded.
+
+### Adding Ad-Hoc Dependencies
+
 To add a dependency to the classpath, use the `distill` function, passing a
 leiningen style dependency vector.
 
 ```clj
 (alembic.still/distill '[org.clojure/tools.logging "0.2.0"])
 ```
+You can pass a sequence of dependencies to add, or just a single
+dependency as in the example above.
 
-If the dependency is added to the classpath, `distill` returns a sequence of
-maps, where each map represents a dependent jar.  Those jars without a current
-version on the classpath will be added to the classpath.  The jars with a
-version already on the classpath are not added to the classpath, and the
-currently loaded version is reported on the :current-version key.
+`distill` prints the dependencies added to the classpath, and those
+not added due to conflicts.
 
-The distill function returns nil, with no side-effects, if the dependency is
-already on the classpath.
+The distill function returns with no side-effects, if the dependency's
+jars are already on the classpath.
 
 By default, `distill` uses the repositories in the current lein project.  You
 can override this by passing a map of lein style repository information to the
 `:repositories` option.  The `project-repositories` function can be used to
 obtain the lein project repositories, should you want to adapt these to pass as
 an `:repositories` argument.
+
+
+For programmatic use, `distill*` returns a sequence of maps, where
+each map represents a dependent jar.  Those jars without a current
+version on the classpath will be added to the classpath.  The jars
+with a version already on the classpath are not added to the
+classpath, and the currently loaded version is reported on the
+:current-version key.
 
 You can query the dependencies that have been added with the
 `dependencies-added` function, which returns a sequence of leiningen style
