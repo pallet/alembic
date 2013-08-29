@@ -1,3 +1,15 @@
+# 0.2.0
+
+- Add load-project, and make distill print changes
+  The load-project function will read the current project.clj file's 
+  dependencies and load any new ones.
+
+  The distill function now prints the dependency coordinates that are 
+  loaded, and separately those that are not due to conflicts.  It also now
+  accepts a sequence of dependencies to load.
+
+  The previous return behaviour of distill is available in distill*.
+
 # 0.1.4
 
 - Update to classlojure 0.7.0
