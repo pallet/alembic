@@ -244,10 +244,10 @@ vectors.
   (let [dep-jars (distill* dependencies options)
         loaded (remove conflicting-version? dep-jars)
         conflicting (filter conflicting-version? dep-jars)]
-    (when (seq loaded)
+    (when (and verbose (seq loaded))
       (println "Loaded dependencies:")
       (print-coords loaded))
-    (when (seq conflicting)
+    (when (and verbose (seq conflicting))
       (println
        "Dependencies not loaded due to conflict with previous jars :")
       (print-coords conflicting))))
