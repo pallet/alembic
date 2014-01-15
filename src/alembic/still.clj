@@ -89,18 +89,21 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
      (project-repositories the-still)))
 
 (defn resolve-dependencies
-  [still dependencies repositories]
+  [still dependencies repositories proxy]
   (classlojure/eval-in
    (:alembic-classloader @still)
-   `(mapv
-     (fn [dep#]
-       (letfn [(apath# [^java.io.File f#] (.getAbsolutePath f#))]
-         {:coords dep#
-          :jar (-> dep# meta :file apath#)}))
-     (keys
-      (aether/resolve-dependencies
-       :coordinates '~(vec dependencies)
-       :repositories ~repositories)))))
+   `(do
+      (require '[leiningen.core.classpath :as ~'cp])
+      (mapv
+       (fn [dep#]
+         (letfn [(apath# [^java.io.File f#] (.getAbsolutePath f#))]
+           {:coords dep#
+            :jar (-> dep# meta :file apath#)}))
+       (keys
+        (aether/resolve-dependencies
+         :coordinates '~(vec dependencies)
+         :repositories ~repositories
+         :proxy (or ~proxy (cp/get-proxy-settings))))))))
 
 (defn properties-path
   [group-id artifact-id]
@@ -170,9 +173,9 @@ containing a `:coords` vector, a `:jar` path and possibly a
 true (the default), then WARN messages will be printed to the console
 if a version of a library is requested and the classpath already
 contains a different version of the same library."
-  [still dependencies repositories {:keys [verbose] :as opts
+  [still dependencies repositories {:keys [verbose proxy] :as opts
                                     :or {verbose true}}]
-  (let [dep-jars (->> (resolve-dependencies still dependencies repositories)
+  (let [dep-jars (->> (resolve-dependencies still dependencies repositories proxy)
                       (current-dep-versions still))]
     (when verbose (warn-mismatch-versions dep-jars))
     (add-dep-jars still dep-jars)
@@ -207,8 +210,21 @@ vectors.
 `:verbose`
 : specifies whether WARN messages should be printed to the console if
   a version of library is requests and there is already a different
-  version of the same library in the classpath. Defaults to true"
-  [dependencies {:keys [repositories still verbose]
+  version of the same library in the classpath. Defaults to true
+
+`:proxy`
+: proxy configuration map (the host scheme and type must match).
+  If not specified (or nil), the proxy configuration is read from
+  environment variables (http_proxy, http_no_proxy, no_proxy).
+    :host - proxy hostname
+    :type - http  (default) | http | https
+    :port - proxy port
+    :non-proxy-hosts - The list of hosts to exclude from proxying, may be null
+    :username - username to log in with, may be null
+    :password - password to log in with, may be null
+    :passphrase - passphrase to log in wth, may be null
+    :private-key-file - private key file to log in with, may be null"
+  [dependencies {:keys [repositories still verbose proxy]
                  :or {still the-still
                       verbose true}}]
   (let [repositories (into {} (or repositories
@@ -217,7 +233,7 @@ vectors.
      still
      (if (every? vector? dependencies) dependencies [dependencies])
      repositories
-     {:verbose verbose})))
+     {:verbose verbose :proxy proxy})))
 
 (defn distill
   "Add dependencies to the classpath.
@@ -236,8 +252,21 @@ vectors.
 `:verbose`
 : specifies whether WARN messages should be printed to the console if
   a version of library is requests and there is already a different
-  version of the same library in the classpath. Defaults to true"
-  [dependencies & {:keys [repositories still verbose]
+  version of the same library in the classpath. Defaults to true
+
+`:proxy`
+: proxy configuration map (the host scheme and type must match).
+  If not specified (or nil), the proxy configuration is read from
+  environment variables (http_proxy, http_no_proxy, no_proxy).
+    :host - proxy hostname
+    :type - http  (default) | http | https
+    :port - proxy port
+    :non-proxy-hosts - The list of hosts to exclude from proxying, may be null
+    :username - username to log in with, may be null
+    :password - password to log in with, may be null
+    :passphrase - passphrase to log in wth, may be null
+    :private-key-file - private key file to log in with, may be null"
+  [dependencies & {:keys [repositories still verbose proxy]
                    :or {still the-still
                         verbose true}
                    :as options}]
@@ -256,7 +285,7 @@ vectors.
   "Load project.clj dependencies.  Returns a vector of jars required
 for the dependencies.  Loads any of the jars that are not conflicting
 with versions already on the classpath."
-  [project-file {:keys [still verbose] :as options}]
+  [project-file {:keys [still verbose proxy] :as options}]
   (let [[dependencies repositories]
         (classlojure/eval-in
          (:alembic-classloader @still)
@@ -269,12 +298,25 @@ with versions already on the classpath."
 
 (defn load-project
   "Load project.clj dependencies.  Prints the dependency jars that are
-loaded, and those that were not loaded due to conflicts."
-  ([project-file & {:keys [still verbose]
+loaded, and those that were not loaded due to conflicts.
+
+`:proxy`
+: proxy configuration map (the host scheme and type must match).
+  If not specified (or nil), the proxy configuration is read from
+  environment variables (http_proxy, http_no_proxy, no_proxy).
+    :host - proxy hostname
+    :type - http  (default) | http | https
+    :port - proxy port
+    :non-proxy-hosts - The list of hosts to exclude from proxying, may be null
+    :username - username to log in with, may be null
+    :password - password to log in with, may be null
+    :passphrase - passphrase to log in wth, may be null
+    :private-key-file - private key file to log in with, may be null"
+  ([project-file & {:keys [still verbose proxy]
                     :or {still the-still
                          verbose true}
                     :as options}]
-     (let [dep-jars (load-project* project-file {:still still :verbose verbose})
+     (let [dep-jars (load-project* project-file {:still still :verbose verbose :proxy proxy})
            loaded (remove conflicting-version? dep-jars)
            conflicting (filter conflicting-version? dep-jars)]
        (when (seq loaded)
