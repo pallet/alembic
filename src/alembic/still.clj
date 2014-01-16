@@ -103,7 +103,7 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
         (aether/resolve-dependencies
          :coordinates '~(vec dependencies)
          :repositories ~repositories
-         :proxy '~(or proxy (cp/get-proxy-settings))))))))
+         :proxy (or ~proxy (cp/get-proxy-settings))))))))
 
 (defn properties-path
   [group-id artifact-id]
