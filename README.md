@@ -6,12 +6,15 @@
 [Annotated source](http://palletops.com/alembic/0.1/annotated/uberdoc.html) &#xb7;
 [Release Notes](https://github.com/pallet/alembic/blob/develop/ReleaseNotes.md)
 
-Alembic is a clojure library that allows you to distill jars onto your classpath
-in a running JVM instance.  It uses leiningen and pomegranate to resolve the
-jars, classlojure to isolate leiningen and its dependencies, and dynapath to
-modify the classpath.
+Alembic is a clojure library that allows you to distill jars onto your
+classpath in a running JVM instance.  You can use it to add
+dependencies to a running REPL, either in an ad-hoc fashion, or by
+reloading your `project.clj` file.
 
-This means you can use lein and pomegranate without their dependencies
+It uses [leiningen][lein] and [pomegranate][pomegranate] to resolve
+the jars, [classlojure][classlojure] to isolate leiningen and its
+dependencies, and [dynapath][dynapath] to modify the classpath.  This
+means you can use lein and pomegranate without their dependencies
 interfering with your project classpath.  The only dependencies added
 are classlojure and dynapath - both small libraries with no transitive
 dependencies.
@@ -24,7 +27,7 @@ do this by adding it to the `:dependencies` vector of the `:dev` profile in
 `project.clj`.
 
 ```clj
-:profiles {:dev {:dependencies [[alembic "0.2.0"]]}}
+:profiles {:dev {:dependencies [[alembic "0.2.1"]]}}
 ```
 
 You can enable Alembic on all you projects, by adding it to the `:dependencies`
@@ -47,7 +50,7 @@ To add a dependency to the classpath, use the `distill` function, passing a
 leiningen style dependency vector.
 
 ```clj
-(alembic.still/distill '[org.clojure/tools.logging "0.2.0"])
+(alembic.still/distill '[org.clojure/tools.logging "0.2.1"])
 ```
 You can pass a sequence of dependencies to add, or just a single
 dependency as in the example above.
@@ -94,3 +97,8 @@ google group, or on #clojure or #pallet on freenode IRC.
 Copyright © 2013 Hugo Duncan
 
 Distributed under the Eclipse Public License.
+
+[lein]: http://leiningen.org "Leiningen"
+[pomegranate]: https://github.com/cemerick/pomegranate#pomegranate-- "Pomegranate"
+[classlojure]: https://github.com/flatland/classlojure "Classlojure"
+[dynapath]: https://github.com/tobias/dynapath#dynapath- "Dynapath"
