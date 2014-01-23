@@ -1,10 +1,20 @@
+# 0.2.1
+
+- Add support for downloads via proxy
+  Adds a :proxy option to load-project and distill.
+
+  If no proxy is specified, the proxy settings are defaulted from
+  environment variables, in the same way as leiningen does.
+
+- Respect verbose flag in distill
+
 # 0.2.0
 
 - Add load-project, and make distill print changes
-  The load-project function will read the current project.clj file's 
+  The load-project function will read the current project.clj file's
   dependencies and load any new ones.
 
-  The distill function now prints the dependency coordinates that are 
+  The distill function now prints the dependency coordinates that are
   loaded, and separately those that are not due to conflicts.  It also now
   accepts a sequence of dependencies to load.
 
