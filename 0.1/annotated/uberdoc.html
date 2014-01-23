@@ -3028,7 +3028,7 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>alembic -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">alembic</h1><h2 class="project-version">0.1.4</h2><br /><p>A jar distiller</p>
+</script><title>alembic -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">alembic</h1><h2 class="project-version">0.2.1</h2><br /><p>A jar distiller</p>
 </div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.4.0</td></tr><tr><td class="dep-name">lein-as-resource</td><td class="dotted"><hr /></td><td class="dep-version">2.1.3</td></tr><tr><td class="dep-name">org.flatland/classlojure</td><td class="dotted"><hr /></td><td class="dep-version">0.7.0</td></tr><tr><td class="dep-name">org.tcrawley/dynapath</td><td class="dotted"><hr /></td><td class="dep-version">0.2.3</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#alembic.still">alembic.still</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#alembic.still" name="alembic.still"><h1 class="project-name">alembic.still</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Track the added dependencies, so that we can query for addition to
 project.clj</p>
 
@@ -3039,6 +3039,7 @@ http://bugs.sun.com/bugdatabase/view<em>bug.do?bug</em>id=4388202</p>
    [classlojure.core :refer [base-classloader classlojure ext-classloader]
     :as classlojure]
    [clojure.java.io :refer [copy file reader resource]]
+   [clojure.pprint :refer [pprint]]
    [dynapath.util :as util])
   (:import
    java.util.Properties))</pre></td></tr><tr><td class="docs"><p>Return the current classpath.</p>
@@ -3052,8 +3053,7 @@ http://bugs.sun.com/bugdatabase/view<em>bug.do?bug</em>id=4388202</p>
   {:pre [(.endsWith jar-path &quot;.jar&quot;)]}
   (let [jar-url (resource jar-path)
         f (java.io.File/createTempFile
-           (subs jar-path 0 (- (count jar-path) 4)) &quot;.jar&quot;)
-        ]
+           (subs jar-path 0 (- (count jar-path) 4)) &quot;.jar&quot;)]
     (.deleteOnExit f)
     (with-open [is (.getContent jar-url)]
       (copy is f))
@@ -3100,19 +3100,22 @@ http://bugs.sun.com/bugdatabase/view<em>bug.do?bug</em>id=4388202</p>
      (project-repositories still &quot;project.clj&quot;))
   ([]
      (project-repositories the-still)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn resolve-dependency
-  [still dependency repositories]
+</td><td class="codes"><pre class="brush: clojure">(defn resolve-dependencies
+  [still dependencies repositories proxy]
   (classlojure/eval-in
    (:alembic-classloader @still)
-   `(mapv
-     (fn [dep#]
-       (letfn [(apath# [^java.io.File f#] (.getAbsolutePath f#))]
-         {:coords dep#
-          :jar (-&gt; dep# meta :file apath#)}))
-     (keys
-      (aether/resolve-dependencies
-       :coordinates '[~dependency]
-       :repositories ~repositories)))))</pre></td></tr><tr><td class="docs">
+   `(do
+      (require '[leiningen.core.classpath :as ~'cp])
+      (mapv
+       (fn [dep#]
+         (letfn [(apath# [^java.io.File f#] (.getAbsolutePath f#))]
+           {:coords dep#
+            :jar (-&gt; dep# meta :file apath#)}))
+       (keys
+        (aether/resolve-dependencies
+         :coordinates '~(vec dependencies)
+         :repositories ~repositories
+         :proxy (or ~proxy (cp/get-proxy-settings))))))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn properties-path
   [group-id artifact-id]
   (str &quot;META-INF/maven/&quot; group-id &quot;/&quot; artifact-id &quot;/pom.properties&quot;))</pre></td></tr><tr><td class="docs"><p>Convert coords to a map of :group-id and :artifact-id.</p>
@@ -3148,34 +3151,44 @@ http://bugs.sun.com/bugdatabase/view<em>bug.do?bug</em>id=4388202</p>
   (doseq [{:keys [coords current-version]} dep-jars
           :let [[artifact version] coords]]
     (when (and current-version (not= current-version version))
-      (println &quot;WARN:&quot; artifact &quot;version&quot; version &quot;requested, but &quot;
-               current-version &quot;already on classpath.&quot;))))</pre></td></tr><tr><td class="docs">
+      (println &quot;WARN:&quot; artifact &quot;version&quot; version &quot;requested, but&quot;
+               current-version &quot;already on classpath.&quot;))))</pre></td></tr><tr><td class="docs"><p>Predicate to check for a conflicting version.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn conflicting-version?
+  [{:keys [coords current-version]}]
+  (and current-version (not= current-version (second coords))))</pre></td></tr><tr><td class="docs"><p>Add any non-conflicting dependency jars.  Returns the sequence of
+dependency jar maps of the loaded jars.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn add-dep-jars
   [still dep-jars]
-  (let [{:keys [classloader]} @still]
-    (doseq [{:keys [coords current-version jar]} dep-jars
-            :let [[artifact version] coords]]
-      (when-not current-version
-        (util/add-classpath-url classloader (.toURL (file jar)))))))</pre></td></tr><tr><td class="docs"><p>Add a dependency to the classpath. Returns a sequence of maps, each
-containing a :coords vector, a :jar path and possibly
-a :current-version string. If the dependency is already on the
-classpath, returns nil. If the optional parameter :verbose is
+  (let [{:keys [classloader]} @still
+        deps (remove :current-version dep-jars)]
+    (doseq [{:keys [jar]} deps]
+      (util/add-classpath-url classloader (.toURL (file jar))))
+    deps))</pre></td></tr><tr><td class="docs"><p>Add dependencies to the classpath. Returns a sequence of maps, each
+containing a <code>:coords</code> vector, a <code>:jar</code> path and possibly a
+<code>:current-version</code> string. If the optional parameter :verbose is
 true (the default), then WARN messages will be printed to the console
 if a version of a library is requested and the classpath already
-contains a different version of the same library</p>
-</td><td class="codes"><pre class="brush: clojure">(defn add-dependency
-  [still dependency repositories
-   &amp; {:keys [verbose] :as opts :or {verbose true}}]
-  (when-not (meta-inf-properties-url still dependency)
-    (let [dep-jars (-&gt;&gt; (resolve-dependency still dependency repositories)
-                        (current-dep-versions still))]
-      (when verbose (warn-mismatch-versions dep-jars))
-      (add-dep-jars still dep-jars)
-      (swap! still (fn [m]
-                     (-&gt; m
-                         (update-in [:dependencies] conj dependency)
-                         (update-in [:jars] assoc dependency dep-jars))))
-      dep-jars)))</pre></td></tr><tr><td class="docs"><p>Add a dependency to the classpath.</p>
+contains a different version of the same library.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn add-dependencies
+  [still dependencies repositories {:keys [verbose proxy] :as opts
+                                    :or {verbose true}}]
+  (let [dep-jars (-&gt;&gt; (resolve-dependencies still dependencies repositories proxy)
+                      (current-dep-versions still))]
+    (when verbose (warn-mismatch-versions dep-jars))
+    (add-dep-jars still dep-jars)
+    (swap! still (fn [m]
+                   (-&gt; m
+                       (update-in [:dependencies]
+                                  #(distinct (concat % dependencies)))
+                       (update-in [:jars]
+                                  #(distinct (concat % dep-jars))))))
+    dep-jars))</pre></td></tr><tr><td class="docs"><p>Pretty print the dependency coordinates of a sequence of dependencies.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn print-coords
+  [deps]
+  (pprint (vec (sort-by first (map :coords deps)))))</pre></td></tr><tr><td class="docs"><p>Add dependencies to the classpath.  Returns a sequence of dependency maps.</p>
+
+<p><code>dependencies</code> can be a coordinate vector, or a sequence of such
+vectors.</p>
 
 <p><code>:repositories</code>
 : specify a map of leiningen style repository definitions to be used when
@@ -3190,13 +3203,120 @@ contains a different version of the same library</p>
 : specifies whether WARN messages should be printed to the console if
   a version of library is requests and there is already a different
   version of the same library in the classpath. Defaults to true</p>
-</td><td class="codes"><pre class="brush: clojure">(defn distill
-  [dependency &amp; {:keys [repositories still verbose]
+
+<p><code>:proxy</code>
+: proxy configuration map (the host scheme and type must match).
+  If not specified (or nil), the proxy configuration is read from
+  environment variables (http<em>proxy, http</em>no<em>proxy, no</em>proxy).
+    :host - proxy hostname
+    :type - http  (default) | http | https
+    :port - proxy port
+    :non-proxy-hosts - The list of hosts to exclude from proxying, may be null
+    :username - username to log in with, may be null
+    :password - password to log in with, may be null
+    :passphrase - passphrase to log in wth, may be null
+    :private-key-file - private key file to log in with, may be null</p>
+</td><td class="codes"><pre class="brush: clojure">(defn distill*
+  [dependencies {:keys [repositories still verbose proxy]
                  :or {still the-still
                       verbose true}}]
   (let [repositories (into {} (or repositories
                                   (project-repositories still)))]
-    (add-dependency still dependency repositories :verbose verbose)))</pre></td></tr><tr><td class="docs">
+    (add-dependencies
+     still
+     (if (every? vector? dependencies) dependencies [dependencies])
+     repositories
+     {:verbose verbose :proxy proxy})))</pre></td></tr><tr><td class="docs"><p>Add dependencies to the classpath.</p>
+
+<p><code>dependencies</code> can be a coordinate vector, or a sequence of such vectors.</p>
+
+<p><code>:repositories</code>
+: specify a map of leiningen style repository definitions to be used when
+  resolving.  Defaults to the repositories specified in the current lein
+  project.</p>
+
+<p><code>:still</code>
+: specifies an alembic still to use.  This would be considered advanced
+  usage (see the tests for an example).</p>
+
+<p><code>:verbose</code>
+: specifies whether WARN messages should be printed to the console if
+  a version of library is requests and there is already a different
+  version of the same library in the classpath. Defaults to true</p>
+
+<p><code>:proxy</code>
+: proxy configuration map (the host scheme and type must match).
+  If not specified (or nil), the proxy configuration is read from
+  environment variables (http<em>proxy, http</em>no<em>proxy, no</em>proxy).
+    :host - proxy hostname
+    :type - http  (default) | http | https
+    :port - proxy port
+    :non-proxy-hosts - The list of hosts to exclude from proxying, may be null
+    :username - username to log in with, may be null
+    :password - password to log in with, may be null
+    :passphrase - passphrase to log in wth, may be null
+    :private-key-file - private key file to log in with, may be null</p>
+</td><td class="codes"><pre class="brush: clojure">(defn distill
+  [dependencies &amp; {:keys [repositories still verbose proxy]
+                   :or {still the-still
+                        verbose true}
+                   :as options}]
+  (let [dep-jars (distill* dependencies options)
+        loaded (remove conflicting-version? dep-jars)
+        conflicting (filter conflicting-version? dep-jars)]
+    (when (and verbose (seq loaded))
+      (println &quot;Loaded dependencies:&quot;)
+      (print-coords loaded))
+    (when (and verbose (seq conflicting))
+      (println
+       &quot;Dependencies not loaded due to conflict with previous jars :&quot;)
+      (print-coords conflicting))))</pre></td></tr><tr><td class="docs"><p>Load project.clj dependencies.  Returns a vector of jars required
+for the dependencies.  Loads any of the jars that are not conflicting
+with versions already on the classpath.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn load-project*
+  [project-file {:keys [still verbose proxy] :as options}]
+  (let [[dependencies repositories]
+        (classlojure/eval-in
+         (:alembic-classloader @still)
+         `(do
+            (require '[leiningen.core.project :as ~'project])
+            (let [project# (leiningen.core.project/read ~project-file)]
+              [(:dependencies project#)
+               (:repositories project#)])))]
+    (add-dependencies still dependencies (into {} repositories) options)))</pre></td></tr><tr><td class="docs"><p>Load project.clj dependencies.  Prints the dependency jars that are
+loaded, and those that were not loaded due to conflicts.</p>
+
+<p><code>:proxy</code>
+: proxy configuration map (the host scheme and type must match).
+  If not specified (or nil), the proxy configuration is read from
+  environment variables (http<em>proxy, http</em>no<em>proxy, no</em>proxy).
+    :host - proxy hostname
+    :type - http  (default) | http | https
+    :port - proxy port
+    :non-proxy-hosts - The list of hosts to exclude from proxying, may be null
+    :username - username to log in with, may be null
+    :password - password to log in with, may be null
+    :passphrase - passphrase to log in wth, may be null
+    :private-key-file - private key file to log in with, may be null</p>
+</td><td class="codes"><pre class="brush: clojure">(defn load-project
+  ([project-file &amp; {:keys [still verbose proxy]
+                    :or {still the-still
+                         verbose true}
+                    :as options}]
+     (let [dep-jars (load-project* project-file {:still still :verbose verbose :proxy proxy})
+           loaded (remove conflicting-version? dep-jars)
+           conflicting (filter conflicting-version? dep-jars)]
+       (when (seq loaded)
+         (println &quot;Loaded dependencies:&quot;)
+         (print-coords loaded))
+       (when (seq conflicting)
+         (println
+          &quot;Dependencies not loaded due to conflict with previous jars :&quot;)
+         (print-coords conflicting))))
+  ([project]
+     (load-project project :still the-still))
+  ([]
+     (load-project &quot;project.clj&quot;)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn dependencies-added
   ([still]
      (:dependencies @still))
@@ -3204,11 +3324,10 @@ contains a different version of the same library</p>
 </td><td class="codes"><pre class="brush: clojure">(defn dependency-jars
   ([still]
      (:jars @still))
-  ([] (dependencies-added the-still)))</pre></td></tr><tr><td class="docs"><p>Return a sequence of possibly conflicting versions of jars required for the
-specified dependency (dependency must have been added with <code>add-dependency</code>).</p>
+  ([] (dependency-jars the-still)))</pre></td></tr><tr><td class="docs"><p>Return a sequence of possibly conflicting versions of jars required
+for dependencies by the still).</p>
 </td><td class="codes"><pre class="brush: clojure">(defn conflicting-versions
-  ([dependency still]
-     (filter :current-version (get (dependency-jars still) dependency)))
-  ([dependency]
-     (conflicting-versions dependency the-still)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+  ([still]
+     (filter conflicting-version? (dependency-jars still)))
+  ([] (conflicting-versions the-still)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>
