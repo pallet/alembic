@@ -92,7 +92,7 @@ currently on the classpath.
 
 ### Invoking Leiningen Tasks
 
-The `lein` macro invokes [leiningen][leiningen].  For example, to
+The `lein` macro invokes [leiningen][lein].  For example, to
 show your project's dependency tree, you could run:
 
 ```clj
