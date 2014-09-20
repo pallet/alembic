@@ -11,10 +11,13 @@ classpath in a running JVM instance.  You can use it to add
 dependencies to a running REPL, either in an ad-hoc fashion, or by
 reloading your `project.clj` file.
 
+You can also use it to invoke leiningen tasks.
+
 It uses [leiningen][lein] and [pomegranate][pomegranate] to resolve
 the jars, [classlojure][classlojure] to isolate leiningen and its
-dependencies, and [dynapath][dynapath] to modify the classpath.  This
-means you can use lein and pomegranate without their dependencies
+dependencies, and [dynapath][dynapath] to modify the classpath.
+
+This means you can use lein and pomegranate without their dependencies
 interfering with your project classpath.  The only dependencies added
 are classlojure and dynapath - both small libraries with no transitive
 dependencies.
@@ -52,6 +55,7 @@ leiningen style dependency vector.
 ```clj
 (alembic.still/distill '[org.clojure/tools.logging "0.2.1"])
 ```
+
 You can pass a sequence of dependencies to add, or just a single
 dependency as in the example above.
 
@@ -85,6 +89,19 @@ You can lookup the dependency jars for the distilled dependencies, using the
 The `conflicting-versions` function returns a sequence of dependencies for a
 distilled dependency, where the dependency jar version doesn't match the version
 currently on the classpath.
+
+### Invoking Leiningen Tasks
+
+The `lein` macro invokes [leiningen][leiningen].  For example, to
+show your project's dependency tree, you could run:
+
+```clj
+(alembic.still/lein deps :tree)
+```
+
+The macro allows you to invoke tasks without passing string arguments.
+If you need to call lein functionally, use the `lein*` function
+instead.
 
 ## Support and Discussion
 

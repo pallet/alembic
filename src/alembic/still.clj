@@ -347,3 +347,32 @@ for dependencies by the still)."
   ([still]
      (filter conflicting-version? (dependency-jars still)))
   ([] (conflicting-versions the-still)))
+
+(defn lein-apply
+  "Invoke lein"
+  [args {:keys [still verbose] :as options}]
+  (classlojure/eval-in
+   (:alembic-classloader @still)
+   `(fn [out# err#]
+      (require '[leiningen.core.main :as ~'main])
+      (binding [main/*exit-process?* false
+                ~'*out* out#
+                ~'*err* err#]
+        (try
+          (main/-main ~@(map str args))
+          (catch Exception e#
+            (let [exit-code# (:exit-code (ex-data e#))]
+              (when-not (and exit-code# (zero? exit-code#))
+                (binding [~'*out* ~'*err*]
+                  (println "Leiningen task failed"))))))))
+   *out* *err*))
+
+(defn lein*
+  "Invoke lein"
+  [& args]
+  (lein-apply args {:still the-still}))
+
+(defmacro lein
+  "Invoke a lein task"
+  [& args]
+  `(lein* ~@(map str args)))
