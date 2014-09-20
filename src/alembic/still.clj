@@ -40,12 +40,6 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
   alembic-cp
   (map extract-jar ["lein-standalone.jar"]))
 
-;; (defn alembic-classloader []
-;;   (doto (alembic.JarClassLoader.
-;;          (into-array java.net.URL alembic-cp) ext-classloader)
-;;     (.loadClass "clojure.lang.RT")
-;;     (#'classlojure/eval-in* '(require 'clojure.main))))
-
 (def cl (apply classlojure alembic-cp))
 
 (defn alembic-classloader
@@ -70,10 +64,6 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
 
 ;;; Our still
 (defonce the-still (atom (make-still base-classloader)))
-
-;; (defn eval-in [still form & args]
-;;   {:pre [(:alembic-classloader @still)]}
-;;   (apply classlojure/eval-in (:alembic-classloader @still) form args))
 
 (defn project-repositories
   "Load project repositories from leiningen."
