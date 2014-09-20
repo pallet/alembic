@@ -1,3 +1,9 @@
+## 0.3.1
+
+- Add a test for running a lein task
+
+- Move clojure dependency to the :provided profile
+
 ## 0.3.0
 
 - Add lein function to run lein tasks

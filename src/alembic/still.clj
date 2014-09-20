@@ -343,13 +343,15 @@ for dependencies by the still)."
   [args {:keys [still verbose] :as options}]
   (classlojure/eval-in
    (:alembic-classloader @still)
+   `(require '[leiningen.core.main]))
+  (classlojure/eval-in
+   (:alembic-classloader @still)
    `(fn [out# err#]
-      (require '[leiningen.core.main :as ~'main])
-      (binding [main/*exit-process?* false
+      (binding [leiningen.core.main/*exit-process?* false
                 ~'*out* out#
                 ~'*err* err#]
         (try
-          (main/-main ~@(map str args))
+          (leiningen.core.main/-main ~@(map str args))
           (catch Exception e#
             (let [exit-code# (:exit-code (ex-data e#))]
               (when-not (and exit-code# (zero? exit-code#))
