@@ -40,12 +40,6 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
   alembic-cp
   (map extract-jar ["lein-standalone.jar"]))
 
-;; (defn alembic-classloader []
-;;   (doto (alembic.JarClassLoader.
-;;          (into-array java.net.URL alembic-cp) ext-classloader)
-;;     (.loadClass "clojure.lang.RT")
-;;     (#'classlojure/eval-in* '(require 'clojure.main))))
-
 (def cl (apply classlojure alembic-cp))
 
 (defn alembic-classloader
@@ -70,10 +64,6 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
 
 ;;; Our still
 (defonce the-still (atom (make-still base-classloader)))
-
-;; (defn eval-in [still form & args]
-;;   {:pre [(:alembic-classloader @still)]}
-;;   (apply classlojure/eval-in (:alembic-classloader @still) form args))
 
 (defn project-repositories
   "Load project repositories from leiningen."
@@ -347,3 +337,32 @@ for dependencies by the still)."
   ([still]
      (filter conflicting-version? (dependency-jars still)))
   ([] (conflicting-versions the-still)))
+
+(defn lein-apply
+  "Invoke lein"
+  [args {:keys [still verbose] :as options}]
+  (classlojure/eval-in
+   (:alembic-classloader @still)
+   `(fn [out# err#]
+      (require '[leiningen.core.main :as ~'main])
+      (binding [main/*exit-process?* false
+                ~'*out* out#
+                ~'*err* err#]
+        (try
+          (main/-main ~@(map str args))
+          (catch Exception e#
+            (let [exit-code# (:exit-code (ex-data e#))]
+              (when-not (and exit-code# (zero? exit-code#))
+                (binding [~'*out* ~'*err*]
+                  (println "Leiningen task failed"))))))))
+   *out* *err*))
+
+(defn lein*
+  "Invoke lein"
+  [& args]
+  (lein-apply args {:still the-still}))
+
+(defmacro lein
+  "Invoke a lein task"
+  [& args]
+  `(lein* ~@(map str args)))

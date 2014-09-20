@@ -11,10 +11,13 @@ classpath in a running JVM instance.  You can use it to add
 dependencies to a running REPL, either in an ad-hoc fashion, or by
 reloading your `project.clj` file.
 
+You can also use it to invoke leiningen tasks.
+
 It uses [leiningen][lein] and [pomegranate][pomegranate] to resolve
 the jars, [classlojure][classlojure] to isolate leiningen and its
-dependencies, and [dynapath][dynapath] to modify the classpath.  This
-means you can use lein and pomegranate without their dependencies
+dependencies, and [dynapath][dynapath] to modify the classpath.
+
+This means you can use lein and pomegranate without their dependencies
 interfering with your project classpath.  The only dependencies added
 are classlojure and dynapath - both small libraries with no transitive
 dependencies.
@@ -27,7 +30,7 @@ do this by adding it to the `:dependencies` vector of the `:dev` profile in
 `project.clj`.
 
 ```clj
-:profiles {:dev {:dependencies [[alembic "0.2.1"]]}}
+:profiles {:dev {:dependencies [[alembic "0.3.0"]]}}
 ```
 
 You can enable Alembic on all you projects, by adding it to the `:dependencies`
@@ -50,8 +53,9 @@ To add a dependency to the classpath, use the `distill` function, passing a
 leiningen style dependency vector.
 
 ```clj
-(alembic.still/distill '[org.clojure/tools.logging "0.2.1"])
+(alembic.still/distill '[org.clojure/tools.logging "0.3.0"])
 ```
+
 You can pass a sequence of dependencies to add, or just a single
 dependency as in the example above.
 
@@ -86,6 +90,34 @@ The `conflicting-versions` function returns a sequence of dependencies for a
 distilled dependency, where the dependency jar version doesn't match the version
 currently on the classpath.
 
+### Invoking Leiningen Tasks
+
+The `lein` macro invokes [leiningen][leiningen].  For example, to
+show your project's dependency tree, you could run:
+
+```clj
+(alembic.still/lein deps :tree)
+```
+
+The macro allows you to invoke tasks without passing string arguments.
+If you need to call lein functionally, use the `lein*` function
+instead.
+
+## Configuring User Profile with Injections
+
+You can reduce the amount of typing you need to use alembic by using
+the [`lein-inject`][lein-inject] plugin and configuring your `:user`
+profile in `~/.lein/profiles.clj`.
+
+```clj
+{:user
+  {:dependencies [[alembic "0.2.0"]]
+   :plugins [[com.palletops/lein-inject "0.1.0"]]
+   :inject-ns {. [alembic.still/distill alembic.still/lein]}}}
+```
+
+This will define the `.` namespace, so you can run `(./lein deps :tree)`.
+
 ## Support and Discussion
 
 Discussion of alembic, either on the
@@ -99,6 +131,7 @@ Copyright © 2013 Hugo Duncan
 Distributed under the Eclipse Public License.
 
 [lein]: http://leiningen.org "Leiningen"
+[lein-inject]: http://github.com/palletops/lein-inject "Lein-inject plugin"
 [pomegranate]: https://github.com/cemerick/pomegranate#pomegranate-- "Pomegranate"
 [classlojure]: https://github.com/flatland/classlojure "Classlojure"
 [dynapath]: https://github.com/tobias/dynapath#dynapath- "Dynapath"

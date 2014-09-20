@@ -1,3 +1,9 @@
+## 0.3.0
+
+- Add lein function to run lein tasks
+
+- Update to lein 2.5.0
+
 # 0.2.1
 
 - Add support for downloads via proxy
