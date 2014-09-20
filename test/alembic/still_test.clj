@@ -69,3 +69,6 @@
 
 (deftest load-project-test
   (is (nil? (still/load-project)) "we can load ourself"))
+
+(deftest lein-test
+  (is (re-find #"org.clojure/clojure" (with-out-str (still/lein deps :tree)))))
