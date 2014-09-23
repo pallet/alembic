@@ -65,6 +65,16 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
 ;;; Our still
 (defonce the-still (atom (make-still base-classloader)))
 
+(defn reset-still
+  "Reset the alembic classloader in the still.  Can be used to reset
+  the classpath of the still, in case of conflicts, e.g. between lein
+  plugins."
+  ([still]
+     (swap! still assoc :alembic-classloader (alembic-classloader))
+     nil)
+  ([]
+     (reset-still the-still)))
+
 (defn project-repositories
   "Load project repositories from leiningen."
   ([still project-file]
