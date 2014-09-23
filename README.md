@@ -11,7 +11,8 @@ classpath in a running JVM instance.  You can use it to add
 dependencies to a running REPL, either in an ad-hoc fashion, or by
 reloading your `project.clj` file.
 
-You can also use it to invoke leiningen tasks.
+You can also use it to reload your `project.clj` file and invoke
+leiningen tasks.
 
 It uses [leiningen][lein] and [pomegranate][pomegranate] to resolve
 the jars, [classlojure][classlojure] to isolate leiningen and its
