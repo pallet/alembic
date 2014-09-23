@@ -2,8 +2,8 @@
 
 [Repository](https://github.com/pallet/alembic) &#xb7;
 [Issues](https://github.com/pallet/alembic/issues) &#xb7;
-[API docs](http://palletops.com/alembic/0.1/api) &#xb7;
-[Annotated source](http://palletops.com/alembic/0.1/annotated/uberdoc.html) &#xb7;
+[API docs](http://palletops.com/alembic/0.3/api) &#xb7;
+[Annotated source](http://palletops.com/alembic/0.3/annotated/uberdoc.html) &#xb7;
 [Release Notes](https://github.com/pallet/alembic/blob/develop/ReleaseNotes.md)
 
 Alembic is a clojure library that allows you to distill jars onto your
