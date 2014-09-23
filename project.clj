@@ -1,4 +1,4 @@
-(defproject alembic "0.3.2-SNAPSHOT"
+(defproject alembic "0.3.2"
   :description
   "A library for use In the REPL.  Add dependencies to your classpath,
   reload your project.clj file, and invoke leiningen tasks."

@@ -1,3 +1,9 @@
+## 0.3.2
+
+- Add function to reset a still classloader
+  Reset the alembic classloader in the still.  Can be used to reset the
+  classpath of the still, in case of conflicts, e.g. between lein plugins.
+
 ## 0.3.1
 
 - Add a test for running a lein task
