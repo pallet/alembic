@@ -113,7 +113,7 @@ profile in `~/.lein/profiles.clj`.
 ```clj
 {:user
   {:dependencies [[alembic "0.2.0"]]
-   :plugins [[com.palletops/lein-inject "0.1.0"]]
+   :plugins [[com.palletops/lein-inject "0.3.1"]]
    :inject-ns {. [alembic.still/distill alembic.still/lein]}}}
 ```
 
