@@ -1,0 +1,306 @@
+<html lang="en">
+  <head>
+    <title>alembic.still documentation</title>
+    <link href="css/default.css" type="text/css" rel="stylesheet" />
+    <link href="css/codox-md.css" type="text/css" rel="stylesheet" />
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/page_effects.js"></script>
+  </head>
+  <body>
+    <header>
+      <div id="header">
+        <h1 class="project-title">Alembic 0.3.3-SNAPSHOT API documentation</h1>
+      </div>
+    </header>
+    <navigation>
+      <div id="namespaces" class="sidebar">
+        <h3>Namespaces</h3>
+        <ul class="ns-links">
+          <li class="ns-list"><a class="ns-link ns-name" href="alembic.still.html">alembic.still</a></li>
+        </ul>
+      </div>
+      <div id="vars" class="sidebar">
+        <h3>Public Vars</h3>
+        <ul class="ns-var-links">
+          <li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-add-dep-jars">add-dep-jars</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-add-dependencies">add-dependencies</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-alembic-classloader">alembic-classloader</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-alembic-cp">alembic-cp</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-classpath-urls">classpath-urls</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-conflicting-version%3F">conflicting-version?</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-conflicting-versions">conflicting-versions</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-coords-%3Eids">coords-&gt;ids</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-distill">distill</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-distill*">distill*</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-extract-jar">extract-jar</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-lein">lein</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-lein*">lein*</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-lein-apply">lein-apply</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-load-project">load-project</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-load-project*">load-project*</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-make-still">make-still</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-meta-inf-properties-url">meta-inf-properties-url</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-meta-inf-version">meta-inf-version</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-print-coords">print-coords</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-project-repositories">project-repositories</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="alembic.still.html#var-reset-still">reset-still</a></li>
+        </ul>
+      </div>
+    </navigation>
+    <article>
+      <div id="content" class="namespace-docs">
+        <h2 class="namespace-title">alembic.still documentation</h2>
+        <div class="doc"><p>Track the added dependencies, so that we can query for addition to
+project.clj</p>
+
+<p>Can not create a classloader with a jar inside a jar
+http://bugs.sun.com/bugdatabase/view<em>bug.do?bug</em>id=4388202</p>
+</div>
+        <div class="ns-vars">
+          <div class="public">
+            <h3><a id="var-add-dep-jars" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L159">add-dep-jars</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[still dep-jars]</div>
+            
+            
+            <div class="doc"><p>Add any non-conflicting dependency jars.  Returns the sequence of
+dependency jar maps of the loaded jars.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-add-dependencies" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L169">add-dependencies</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[still dependencies repositories {:keys [verbose proxy], :as opts, :or {verbose true}}]</div>
+            
+            
+            <div class="doc"><p>Add dependencies to the classpath. Returns a sequence of maps, each
+containing a <code>:coords</code> vector, a <code>:jar</code> path and possibly a
+<code>:current-version</code> string. If the optional parameter :verbose is
+true (the default), then WARN messages will be printed to the console
+if a version of a library is requested and the classpath already
+contains a different version of the same library.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-alembic-classloader" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L45">alembic-classloader</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[]</div>
+            
+            
+            <div class="doc"><p>Return a classloader for alembic to use to resolve dependencies</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-alembic-cp" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L39">alembic-cp</a></h3>
+            <h4 class="var-type var" id="var-type">var</h4>
+            
+            
+            
+            <div class="doc"><p>Classpath URLs for a still</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-classpath-urls" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L20">classpath-urls</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[]</div>
+            
+            
+            <div class="doc"><p>Return the current classpath.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-conflicting-version%3F" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L154">conflicting-version?</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[{:keys [coords current-version]}]</div>
+            
+            
+            <div class="doc"><p>Predicate to check for a conflicting version.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-conflicting-versions" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L344">conflicting-versions</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[still]</div><div class="usage">[]</div>
+            
+            
+            <div class="doc"><p>Return a sequence of possibly conflicting versions of jars required
+for dependencies by the still).</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-coords-%3Eids" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L112">coords-&gt;ids</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[[artifact version :as coords]]</div>
+            
+            
+            <div class="doc"><p>Convert coords to a map of :group-id and :artifact-id.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-distill" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L238">distill</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[dependencies &amp; {:keys [repositories still verbose proxy], :or {still the-still, verbose true}, :as options}]</div>
+            
+            
+            <div class="doc"><p>Add dependencies to the classpath.</p>
+
+<p><code>dependencies</code> can be a coordinate vector, or a sequence of such vectors.</p>
+
+<p><code>:repositories</code>
+: specify a map of leiningen style repository definitions to be used when
+  resolving.  Defaults to the repositories specified in the current lein
+  project.</p>
+
+<p><code>:still</code>
+: specifies an alembic still to use.  This would be considered advanced
+  usage (see the tests for an example).</p>
+
+<p><code>:verbose</code>
+: specifies whether WARN messages should be printed to the console if
+  a version of library is requests and there is already a different
+  version of the same library in the classpath. Defaults to true</p>
+
+<p><code>:proxy</code>
+: proxy configuration map (the host scheme and type must match).
+  If not specified (or nil), the proxy configuration is read from
+  environment variables (http<em>proxy, http</em>no<em>proxy, no</em>proxy).
+    :host - proxy hostname
+    :type - http  (default) | http | https
+    :port - proxy port
+    :non-proxy-hosts - The list of hosts to exclude from proxying, may be null
+    :username - username to log in with, may be null
+    :password - password to log in with, may be null
+    :passphrase - passphrase to log in wth, may be null
+    :private-key-file - private key file to log in with, may be null</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-distill*" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L195">distill*</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[dependencies {:keys [repositories still verbose proxy], :or {still the-still, verbose true}}]</div>
+            
+            
+            <div class="doc"><p>Add dependencies to the classpath.  Returns a sequence of dependency maps.</p>
+
+<p><code>dependencies</code> can be a coordinate vector, or a sequence of such
+vectors.</p>
+
+<p><code>:repositories</code>
+: specify a map of leiningen style repository definitions to be used when
+  resolving.  Defaults to the repositories specified in the current lein
+  project.</p>
+
+<p><code>:still</code>
+: specifies an alembic still to use.  This would be considered advanced
+  usage (see the tests for an example).</p>
+
+<p><code>:verbose</code>
+: specifies whether WARN messages should be printed to the console if
+  a version of library is requests and there is already a different
+  version of the same library in the classpath. Defaults to true</p>
+
+<p><code>:proxy</code>
+: proxy configuration map (the host scheme and type must match).
+  If not specified (or nil), the proxy configuration is read from
+  environment variables (http<em>proxy, http</em>no<em>proxy, no</em>proxy).
+    :host - proxy hostname
+    :type - http  (default) | http | https
+    :port - proxy port
+    :non-proxy-hosts - The list of hosts to exclude from proxying, may be null
+    :username - username to log in with, may be null
+    :password - password to log in with, may be null
+    :passphrase - passphrase to log in wth, may be null
+    :private-key-file - private key file to log in with, may be null</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-extract-jar" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L25">extract-jar</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[jar-path]</div>
+            
+            
+            <div class="doc"><p>Extract a jar on the classpath to the filesystem, returning its URL.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-lein" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L377">lein</a></h3>
+            <h4 class="var-type macro" id="var-type">macro</h4>
+            <div class="usage">[&amp; args]</div>
+            
+            
+            <div class="doc"><p>Invoke a lein task</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-lein*" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L372">lein*</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[&amp; args]</div>
+            
+            
+            <div class="doc"><p>Invoke lein</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-lein-apply" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L351">lein-apply</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[args {:keys [still verbose], :as options}]</div>
+            
+            
+            <div class="doc"><p>Invoke lein</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-load-project" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L299">load-project</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[project-file &amp; {:keys [still verbose proxy], :or {still the-still, verbose true}, :as options}]</div><div class="usage">[project]</div><div class="usage">[]</div>
+            
+            
+            <div class="doc"><p>Load project.clj dependencies.  Prints the dependency jars that are
+loaded, and those that were not loaded due to conflicts.</p>
+
+<p><code>:proxy</code>
+: proxy configuration map (the host scheme and type must match).
+  If not specified (or nil), the proxy configuration is read from
+  environment variables (http<em>proxy, http</em>no<em>proxy, no</em>proxy).
+    :host - proxy hostname
+    :type - http  (default) | http | https
+    :port - proxy port
+    :non-proxy-hosts - The list of hosts to exclude from proxying, may be null
+    :username - username to log in with, may be null
+    :password - password to log in with, may be null
+    :passphrase - passphrase to log in wth, may be null
+    :private-key-file - private key file to log in with, may be null</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-load-project*" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L284">load-project*</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[project-file {:keys [still verbose proxy], :as options}]</div>
+            
+            
+            <div class="doc"><p>Load project.clj dependencies.  Returns a vector of jars required
+for the dependencies.  Loads any of the jars that are not conflicting
+with versions already on the classpath.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-make-still" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L52">make-still</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[classloader]</div>
+            
+            
+            <div class="doc"><p>Create an still that that can distill jars into the specified classloader.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-meta-inf-properties-url" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L118">meta-inf-properties-url</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[still coords]</div>
+            
+            
+            <div class="doc"><p>Return a URL for the META-INF properties file for the given <code>coords</code>.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-meta-inf-version" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L127">meta-inf-version</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[still coords]</div>
+            
+            
+            <div class="doc"><p>Return a version string for the currently loaded version of the given
+<code>coords</code>.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-print-coords" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L190">print-coords</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[deps]</div>
+            
+            
+            <div class="doc"><p>Pretty print the dependency coordinates of a sequence of dependencies.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-project-repositories" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L78">project-repositories</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[still project-file]</div><div class="usage">[still]</div><div class="usage">[]</div>
+            
+            
+            <div class="doc"><p>Load project repositories from leiningen.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-reset-still" class="source var-name" href="https://github.com/pallet/alembic/blob/develop/src/alembic/still.clj#L68">reset-still</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[still]</div><div class="usage">[]</div>
+            
+            
+            <div class="doc"><p>Reset the alembic classloader in the still.  Can be used to reset
+the classpath of the still, in case of conflicts, e.g. between lein
+plugins.</p>
+</div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </body>
+
+</html>
