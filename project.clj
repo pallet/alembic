@@ -1,5 +1,7 @@
 (defproject alembic "0.3.2-SNAPSHOT"
-  :description "A jar distiller"
+  :description
+  "A library for use In the REPL.  Add dependencies to your classpath,
+  reload your project.clj file, and invoke leiningen tasks."
   :url "https://github.com/pallet/alembic"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
