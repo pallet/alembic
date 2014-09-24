@@ -107,14 +107,14 @@ instead.
 ## Configuring User Profile with Injections
 
 You can reduce the amount of typing you need to use alembic by using
-the [`lein-inject`][lein-inject] plugin and configuring your `:user`
+the [`lein-shorthand`][lein-shorthand] plugin and configuring your `:user`
 profile in `~/.lein/profiles.clj`.
 
 ```clj
 {:user
-  {:dependencies [[alembic "0.2.0"]]
-   :plugins [[com.palletops/lein-inject "0.3.1"]]
-   :inject-ns {. [alembic.still/distill alembic.still/lein]}}}
+  {:dependencies [[alembic "0.3.2"]]
+   :plugins [[com.palletops/lein-shorthand "0.4.0"]]
+   :shorthand {. [alembic.still/distill alembic.still/lein]}}}
 ```
 
 This will define the `.` namespace, so you can run `(./lein deps :tree)`.
@@ -132,7 +132,7 @@ Copyright © 2013 Hugo Duncan
 Distributed under the Eclipse Public License.
 
 [lein]: http://leiningen.org "Leiningen"
-[lein-inject]: http://github.com/palletops/lein-inject "Lein-inject plugin"
+[lein-shorthand]: http://github.com/palletops/lein-shorthand "lein-shorthand plugin"
 [pomegranate]: https://github.com/cemerick/pomegranate#pomegranate-- "Pomegranate"
 [classlojure]: https://github.com/flatland/classlojure "Classlojure"
 [dynapath]: https://github.com/tobias/dynapath#dynapath- "Dynapath"
