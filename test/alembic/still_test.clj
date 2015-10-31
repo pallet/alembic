@@ -11,7 +11,7 @@
   "Return the path of a clojure jar."
   []
   (let [cl (still/alembic-classloader)]
-    (classlojure/eval-in
+    (still/eval-in
      cl
      `(letfn [(apath# [^java.io.File f#] (.getAbsolutePath f#))]
         (->
@@ -39,7 +39,7 @@
               (map #(.toString %) (util/all-classpath-urls cl))))
     (is (= [{:coords clojure-dep :current-version "1.4.0"}]
            (still/current-dep-versions still [{:coords clojure-dep}])))
-    (is (nil? (classlojure/eval-in
+    (is (nil? (still/eval-in
                cl
                `(do
                   (try (require 'clojure.tools.logging)
@@ -54,7 +54,7 @@
           "One dependency jar added")
       (is (= 1 (count (filter :current-version deps)))
           "One possible dependency conflict")
-      (is (classlojure/eval-in
+      (is (still/eval-in
            cl
            `(do
               (require 'clojure.tools.logging)

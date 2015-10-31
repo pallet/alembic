@@ -34,6 +34,17 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
       (copy is f))
     (.toURL f)))
 
+(defmacro with-printing-globals-reset [& body]
+  `(binding [*print-dup* false
+             *print-length* nil
+             *print-level* nil
+             *print-meta* false
+             *print-readably* true]
+     ~@body))
+
+(defn eval-in [& args]
+  (with-printing-globals-reset
+    (apply classlojure/eval-in args)))
 
 ;;; ## Still
 (defonce ^{:doc "Classpath URLs for a still"}
@@ -45,9 +56,10 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
 (defn alembic-classloader
   "Return a classloader for alembic to use to resolve dependencies"
   []
-  (doto (apply classlojure alembic-cp)
-    (classlojure/eval-in
-     `(require '[cemerick.pomegranate.aether :as ~'aether]))))
+  (with-printing-globals-reset
+    (doto (apply classlojure alembic-cp)
+      (eval-in
+       `(require '[cemerick.pomegranate.aether :as ~'aether])))))
 
 (defn make-still
   "Create an still that that can distill jars into the specified classloader."
@@ -78,7 +90,7 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
 (defn project-repositories
   "Load project repositories from leiningen."
   ([still project-file]
-     (classlojure/eval-in
+     (eval-in
       (:alembic-classloader @still)
       `(do
          (require '[leiningen.core.project :as ~'project])
@@ -90,7 +102,7 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
 
 (defn resolve-dependencies
   [still dependencies repositories proxy]
-  (classlojure/eval-in
+  (eval-in
    (:alembic-classloader @still)
    `(do
       (require '[leiningen.core.classpath :as ~'cp])
@@ -119,7 +131,7 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
   "Return a URL for the META-INF properties file for the given `coords`."
   [still coords]
   (let [{:keys [group-id artifact-id]} (coords->ids coords)]
-    (classlojure/eval-in
+    (eval-in
      (:classloader @still)
      `(when-let [r# (resource ~(properties-path group-id artifact-id))]
         (.toString r#)))))
@@ -129,7 +141,7 @@ http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4388202
   `coords`."
   [still coords]
   (let [{:keys [group-id artifact-id]} (coords->ids coords)]
-    (classlojure/eval-in
+    (eval-in
      (:classloader @still)
      `(when-let [r# (resource ~(properties-path group-id artifact-id))]
         (with-open [rdr# (reader r#)]
@@ -287,7 +299,7 @@ for the dependencies.  Loads any of the jars that are not conflicting
 with versions already on the classpath."
   [project-file {:keys [still verbose proxy] :as options}]
   (let [[dependencies repositories]
-        (classlojure/eval-in
+        (eval-in
          (:alembic-classloader @still)
          `(do
             (require '[leiningen.core.project :as ~'project])
@@ -351,10 +363,10 @@ for dependencies by the still)."
 (defn lein-apply
   "Invoke lein"
   [args {:keys [still verbose] :as options}]
-  (classlojure/eval-in
+  (eval-in
    (:alembic-classloader @still)
    `(require '[leiningen.core.main]))
-  (classlojure/eval-in
+  (eval-in
    (:alembic-classloader @still)
    `(fn [out# err#]
       (binding [leiningen.core.main/*exit-process?* false
