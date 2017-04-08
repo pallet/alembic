@@ -7,7 +7,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[lein-as-resource "2.5.0"]
                  [org.flatland/classlojure "0.7.0"]
-                 [org.tcrawley/dynapath "0.2.3"]]
+                 [org.tcrawley/dynapath "0.2.5"]]
   :exclusions [[org.clojure/clojure]]
   :profiles {:provided
              {:dependencies [[org.clojure/clojure "1.4.0"]]}})
